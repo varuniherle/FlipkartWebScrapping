@@ -26,3 +26,37 @@ def index():
             prodRes = requests.get(productLink) # getting the product page from server
             prod_html = bs(prodRes.text, "html.parser") # parsing the product page as HTML
             commentboxes = prod_html.find_all('div', {'class': "_3nrCtb"}) # finding the HTML section containing the customer comments
+
+
+                
+            for commentbox in commentboxes:
+                    try:
+                        name = commentbox.div.div.find_all('p', {'class': '_3LYOAd _3sxSiS'})[0].text
+
+                    except:
+                        name = 'No Name'
+
+                    try:
+                        rating = commentbox.div.div.div.div.text
+
+                    except:
+                        rating = 'No Rating'
+
+                    try:
+                        commentHead = commentbox.div.div.div.p.text
+                    except:
+                        commentHead = 'No Comment Heading'
+                    try:
+                        comtag = commentbox.div.div.find_all('div', {'class': ''})
+                        custComment = comtag[0].div.text
+                    except:
+                        custComment = 'No Customer Comment'
+                    #fw.write(searchString+","+name.replace(",", ":")+","+rating + "," + commentHead.replace(",", ":") + "," + custComment.replace(",", ":") + "\n")
+                    mydict = {"Product": searchString, "Name": name, "Rating": rating, "CommentHead": commentHead,
+                              "Comment": custComment} # saving that detail to a dictionary
+                    reviews.append(mydict)
+            return render_template('results.html', reviews=reviews) # showing the review to the user
+        else:
+            return render_template('index.html')
+if __name__ == "__main__":
+    app.run(port=8000,debug=True) # running the app on the local machine on port 8000
